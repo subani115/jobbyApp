@@ -1,0 +1,21 @@
+.s-job-card-item {
+  background-color: #202020;
+  width: 31%;
+  height: 400px;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.s-location-container {
+  width: 60%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.s-icons-container {
+  width: 40%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}

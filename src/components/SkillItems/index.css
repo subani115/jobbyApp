@@ -1,0 +1,8 @@
+.skill-item {
+  width: 33%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 30px;
+  margin-top: 25px;
+}
