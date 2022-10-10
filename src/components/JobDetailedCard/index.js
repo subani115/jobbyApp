@@ -31,21 +31,21 @@ class JobDetailedCard extends Component {
     this.getJobCardDetails()
   }
 
-  getJobCardDetails = async () => {
-    this.setState({fetchStatus: fetchStages.loading})
-    const jwtToken = Cookies.get('jwt_token')
-    const {match} = this.props
-    const {params} = match
-    const {id} = params
-    const url = `https://apis.ccbp.in/jobs/${id}`
-    const options = {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
-    }
-    const response = await fetch(url, options)
-    const data = await response.json()
+  fetchSuccess = (newJobsList, newSkillsList, newDesc, newSimilarJobsList) => {
+    this.setState({
+      jobCard: newJobsList,
+      skills: newSkillsList,
+      lifeDescription: newDesc,
+      similarJobsList: newSimilarJobsList,
+      fetchStatus: fetchStages.fetchCompleted,
+    })
+  }
+
+  fetchFailed = () => {
+    this.setState({fetchStatus: fetchStages.fetchFailed})
+  }
+
+  getDetails = data => {
     const jobDetails = data.job_details
     const newSimilarJobsList = data.similar_jobs.map(each => ({
       id: each.id,
@@ -77,16 +77,31 @@ class JobDetailedCard extends Component {
       name: each.name,
       imgUrl: each.image_url,
     }))
-    if (response.ok) {
-      this.setState({
-        jobCard: newJobsList,
-        skills: newSkillsList,
-        lifeDescription: newDesc,
-        similarJobsList: newSimilarJobsList,
-        fetchStatus: fetchStages.fetchCompleted,
-      })
+
+    this.fetchSuccess(newJobsList, newSkillsList, newDesc, newSimilarJobsList)
+  }
+
+  getJobCardDetails = async () => {
+    this.setState({fetchStatus: fetchStages.loading})
+    const jwtToken = Cookies.get('jwt_token')
+    const {match} = this.props
+    const {params} = match
+    const {id} = params
+    const url = `https://apis.ccbp.in/jobs/${id}`
+    const options = {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }
+    const response = await fetch(url, options)
+    const data = await response.json()
+    console.log(data)
+
+    if (response.ok === true) {
+      this.getDetails(data)
     } else {
-      this.setState({fetchStatus: fetchStages.fetchFailed})
+      this.fetchFailed()
     }
   }
 
@@ -95,8 +110,17 @@ class JobDetailedCard extends Component {
   }
 
   renderLoadingView = () => (
-    <div className="loader-container" testid="loader">
-      <Loader type="ThreeDots" color="#ffffff" height="50" width="50" />
+    <div className="bg-container">
+      <Header />
+      <div className="loader-container">
+        <Loader
+          type="ThreeDots"
+          color="#ffffff"
+          height="50"
+          width="50"
+          testid="loader"
+        />
+      </div>
     </div>
   )
 
@@ -185,19 +209,26 @@ class JobDetailedCard extends Component {
   }
 
   renderFailureView = () => (
-    <div className="failed-view-container">
-      <img
-        src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
-        alt="failure view"
-        className="failed-view-img"
-      />
-      <h1>Oops! Something Went Wrong</h1>
-      <p className="m-text">
-        We cannot seem to find the page you are looking for
-      </p>
-      <button type="button" className="btn" onClick={this.retryFetchingJobCard}>
-        Retry
-      </button>
+    <div className="bg-container">
+      <Header />
+      <div className="failed-view-container">
+        <img
+          src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
+          alt="failure view"
+          className="failed-view-img"
+        />
+        <h1>Oops! Something Went Wrong</h1>
+        <p className="m-text">
+          We cannot seem to find the page you are looking for
+        </p>
+        <button
+          type="button"
+          className="btn"
+          onClick={this.retryFetchingJobCard}
+        >
+          Retry
+        </button>
+      </div>
     </div>
   )
 
